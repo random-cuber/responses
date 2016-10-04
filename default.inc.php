@@ -6,7 +6,7 @@
 $config = array();
 
 // activate plugin features
-$config['plugin.responses.activate_plugin'] = true; // TODO
+$config['plugin.responses.activate_plugin'] = true;
 
 // permit plugin logging
 $config['plugin.responses.enable_logging'] = true;
@@ -21,18 +21,27 @@ $config['plugin.responses.enable_inject'] = true;
 $config['plugin.responses.inject_static'] = true;
 
 // switch compose editor format to match the template
-$config['plugin.responses.switch_format'] = true; // TODO
+$config['plugin.responses.switch_format'] = true;
+
+// suppress editor mode (html vs text) change warning
+$config['plugin.responses.editor_warned'] = true;
 
 // allow one time reset of all user responses 
 $config['plugin.responses.memento_reset'] = false;
 
-// field bracket open/close
+// surrounding field brackets, i.e. variable: {from_name}
 $config['plugin.responses.variable_prefix'] = '{';
 $config['plugin.responses.variable_suffix'] = '}';
 
+// regex for template format detection: i.e. name looks like: "some name : html"
+$config['plugin.responses.format_regex_name'] = '^html[\s:#@]+.+|.+[\s:#@]+html$';
+
+// regex for template format detection: i.e. text looks like: "<div> ... </div>"
+$config['plugin.responses.format_regex_text'] = '^[<][\s\S]+[>]$';
+
 // XXX: no config override
 // plugin-provided template
-$response_text_help = <<<EOT
+$response_help = <<<EOT
     #
     This response template shows available plugin fields.
     Variable substitution uses curly braces around field names. 
@@ -98,13 +107,14 @@ $response_html_thank_you = <<<EOT
     <b>{from_head}</b>.
 </div>
 <p/>
-<div style="width: 25em;">
+<div style="width: 30em;">
     <hr>
     <i>
     {from_full}
     &lt;<a href="mailto:{from_mail}">{from_mail}</a>&gt;
     </i>
 </div>
+<p/>
 EOT;
 
 // XXX: name is response identity
@@ -113,12 +123,7 @@ EOT;
 $config['plugin.responses.template_mapa'] = array(
         array(
             'name' => '[plugin.responses] help',
-            'text' => $response_text_help,
-            'format' => 'text',
-        ),
-        array(
-            'name' => '[plugin.responses] text thank you',
-            'text' => $response_text_thank_you,
+            'text' => $response_help,
             'format' => 'text',
         ),
         array(
@@ -126,6 +131,41 @@ $config['plugin.responses.template_mapa'] = array(
             'text' => $response_html_thank_you,
             'format' => 'html',
         ),
+        array(
+            'name' => '[plugin.responses] text thank you',
+            'text' => $response_text_thank_you,
+            'format' => 'text',
+        ),
+);
+
+/////// settings
+
+// expose these settings in user ui
+$config['plugin.responses.settings_checkbox_list'] = array(
+        'activate_plugin',
+        'enable_logging',
+        // 'enable_addrbook',
+        'enable_inject',
+        'inject_static',
+        'switch_format',
+        // 'editor_warned',
+        // 'memento_reset',
+);
+
+// expose these settings in user ui
+$config['plugin.responses.settings_select_list'] = array(
+);
+
+// expose these settings in user ui
+$config['plugin.responses.settings_area_list'] = array(
+);
+
+// expose these settings in user ui
+$config['plugin.responses.settings_text_list'] = array(
+        // 'format_regex_name',
+        // 'format_regex_text',
+        // 'variable_prefix',
+        // 'variable_suffix',
 );
 
 ?>

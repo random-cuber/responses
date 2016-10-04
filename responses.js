@@ -229,27 +229,71 @@ plugin_responses = function plugin_responses() {
 
 		self.log('mapping=' + self.json_encode(mapping, 4));
 		self.log('format=' + format);
-		
-		// TODO switch editor format
 
-		this.editor.replace(text, format);
+		function perform_insert() {
+			rcmail.editor.replace(text, format);
+		}
+
+		if (self.env('switch_format')) {
+			if (self.switch_format(format)) {
+				// time for editor replacement
+				window.setTimeout(perform_insert, 250);
+			}
+		} else {
+			perform_insert();
+		}
+
 	}
 
-	// workaround for missing format settings ui
-	this.detect_format = function(response) {
-		// format defined // FIXME
-		// if (response.format) {
-		// return response.format;
-		// }
-		var name = response.name;
-		// format defined
-		if (name.startsWith('html:')) {
+	// change editor mode (text vs html)
+	this.switch_format = function switch_format(format) {
+		var select = $('select[name=editorSelector]');
+		if (select.length == 0) {
+			self.log('invalid select', true);
+			return false;
+		}
+		if (format == 'html' && select.val() == 'html') {
+			self.log('keep: ' + format);
+			return true;
+		}
+		if (format == 'text' && select.val() == 'plain') {
+			self.log('keep: ' + format);
+			return true;
+		}
+		self.log('change: ' + format);
+		var result = rcmail.toggle_editor({
+			html : (format == 'html'),
+		});
+		if (result) {
+			switch (format) {
+			case 'html':
+				select.val('html');
+				break;
+			case 'text':
+				select.val('plain');
+				break;
+			}
+		}
+		return result;
+	}
+
+	// workaround for missing format in settings ui
+	this.detect_format = function detect_format(response) {
+		var name = response.name || '';
+		var rx_name = new RegExp(self.env('format_regex_name'), 'i');
+		if (rx_name.test(name.trim())) {
+			self.log('matched: name');
 			return 'html';
 		}
-		var text = response.text;
-		// format guessed: "< .... >"
-		if (/^[<][\s\S]+/.test(text) && /[\s\S]+[>]$/.test(text)) {
+		var text = response.text || '';
+		var rx_text = new RegExp(self.env('format_regex_text'), 'i');
+		if (rx_text.test(text.trim())) {
+			self.log('matched: text');
 			return 'html';
+		}
+		if (response.format) {
+			self.log('defined: item');
+			return response.format; // FIXME
 		}
 		return 'text';
 	}
@@ -301,9 +345,22 @@ plugin_responses = function plugin_responses() {
 		});
 	}
 
+	//
+	this.is_plugin_active = function is_plugin_active() {
+		return self.env('activate_plugin');
+	}
+
 	// plugin setup
 	this.initialize = function initialize() {
-		self.log('...');
+
+		if (self.is_plugin_active()) {
+			self.log('enabled');
+		} else {
+			self.log('disabled');
+			return;
+		}
+
+		rcmail.env.editor_warned = self.env('editor_warned');
 
 		rcmail.insert_response = //
 		self.rcube_webmail_insert_response.bind(rcmail);
@@ -318,7 +375,7 @@ plugin_responses = function plugin_responses() {
 }
 
 // plugin scope
-if (rcmail && !rcmail.is_framed()) {
+if (window.rcmail && !rcmail.is_framed()) {
 
 	// plugin instance
 	rcmail.addEventListener('init', function(param) {
