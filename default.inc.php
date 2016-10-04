@@ -6,10 +6,13 @@
 $config = array();
 
 // activate plugin features
-$config['plugin.responses.activate_plugin'] = true;
+$config['plugin.responses.activate_plugin'] = true; // TODO
 
 // permit plugin logging
 $config['plugin.responses.enable_logging'] = true;
+
+// permit address book lookup
+$config['plugin.responses.enable_addrbook'] = true; // TODO
 
 // allow to inject plugin-provided templates
 $config['plugin.responses.enable_inject'] = true;
@@ -17,8 +20,15 @@ $config['plugin.responses.enable_inject'] = true;
 // inject plugin-provided templates as read-only vs editable
 $config['plugin.responses.inject_static'] = true;
 
+// switch compose editor format to match the template
+$config['plugin.responses.switch_format'] = true; // TODO
+
 // allow one time reset of all user responses 
 $config['plugin.responses.memento_reset'] = false;
+
+// field bracket open/close
+$config['plugin.responses.variable_prefix'] = '{';
+$config['plugin.responses.variable_suffix'] = '}';
 
 // XXX: no config override
 // plugin-provided template
@@ -74,28 +84,45 @@ $response_text_thank_you = <<<EOT
     --
     {from_full} <{from_mail}>
 EOT;
-
+ 
 // XXX: no config override
 // plugin-provided template
 $response_html_thank_you = <<<EOT
-    <b>TODO</b>
+<div style="margin-left:2em;">
+    <b>{to_head}</b>, hello.
+    <br/>
+    <br/>
+    <br/>
+    Thank you,
+    <br/>
+    <b>{from_head}</b>.
+</div>
+<p/>
+<div style="width: 25em;">
+    <hr>
+    <i>
+    {from_full}
+    &lt;<a href="mailto:{from_mail}">{from_mail}</a>&gt;
+    </i>
+</div>
 EOT;
 
+// XXX: name is response identity
 // TODO: use local system templates
 // plugin-provided template collection
 $config['plugin.responses.template_mapa'] = array(
         array(
-            'name' => '[plugin.responses] help', // XXX: name is response identity
+            'name' => '[plugin.responses] help',
             'text' => $response_text_help,
             'format' => 'text',
         ),
         array(
-            'name' => '[plugin.responses] text thank you', // XXX: name is response identity
+            'name' => '[plugin.responses] text thank you',
             'text' => $response_text_thank_you,
             'format' => 'text',
         ),
         array(
-            'name' => '[plugin.responses] html thank you', // XXX: name is response identity
+            'name' => '[plugin.responses] html thank you',
             'text' => $response_html_thank_you,
             'format' => 'html',
         ),

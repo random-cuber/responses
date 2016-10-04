@@ -14,8 +14,9 @@ class responses extends rcube_plugin {
     private static $environ_names = array(
         'activate_plugin',
         'enable_logging',
-        // 'enable_inject',
-        // 'template_mapa',
+        'switch_format',
+        'variable_prefix',
+        'variable_suffix',
     );
     
     private $rc; // controller singleton

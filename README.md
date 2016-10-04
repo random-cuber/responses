@@ -11,6 +11,8 @@ Plugin provides variable substitution in the compose response templates
 by injecting fields derived from the composed mail headers (from, to, cc),
 and thus can make mail messages more personal.
 
+Plugin also adds support for html-based response templates.
+
 For example, assuming the following compose message headers:
 ```
 from: "thomas cube" <thomas@roundcube.net>

@@ -106,8 +106,49 @@ plugin_responses = function plugin_responses() {
 		return item;
 	}
 
-	// rcmail function replacement
-	this.insert_response = function insert_response(key) {
+	// function replacement: see editor.js/rcube_text_editor.replace()
+	this.rcube_text_editor_replace = function rcube_text_editor_replace(text,
+			format) {
+		var ed = this.editor;
+		// insert into tinymce editor
+		if (ed) {
+			ed.getWin().focus(); // correct focus in IE & Chrome
+			format = format ? format : 'text';
+			var content = '[invalid]';
+			if (format == 'html') {
+				content = text;
+			}
+			if (format == 'text') {
+				content = rcmail.quote_html(text).replace(/\r?\n/g, '<br/>');
+			}
+			ed.selection.setContent(content, {
+				format : format
+			});
+		}
+		// replace selection in compose textarea
+		else if (ed = rcube_find_object(this.id)) {
+			var selection = $(ed).is(':focus') ? rcmail.get_input_selection(ed)
+					: {
+						start : 0,
+						end : 0
+					}, inp_value = ed.value;
+			pre = inp_value.substring(0, selection.start), end = inp_value
+					.substring(selection.end, inp_value.length);
+
+			// insert response text
+			ed.value = pre + text + end;
+
+			// set caret after inserted text
+			rcmail.set_caret_pos(ed, selection.start + text.length);
+			ed.focus();
+		}
+	};
+
+	// function replacement: see app.js/rcube_webmail.insert_response()
+	this.rcube_webmail_insert_response = function rcube_webmail_insert_response(
+			key) {
+		self.log('key: ' + key);
+
 		var response_mapa = rcmail.env.textresponses;
 		if (!response_mapa) {
 			self.log('invalid response_mapa', true);
@@ -183,11 +224,34 @@ plugin_responses = function plugin_responses() {
 			cc_mail : make_list(cc_list, 'mail'),
 		};
 
+		var text = self.var_subst(template, mapping);
+		var format = self.detect_format(response);
+
 		self.log('mapping=' + self.json_encode(mapping, 4));
+		self.log('format=' + format);
+		
+		// TODO switch editor format
 
-		var mail_text = self.var_subst(template, mapping);
+		this.editor.replace(text, format);
+	}
 
-		rcmail.editor.replace(mail_text);
+	// workaround for missing format settings ui
+	this.detect_format = function(response) {
+		// format defined // FIXME
+		// if (response.format) {
+		// return response.format;
+		// }
+		var name = response.name;
+		// format defined
+		if (name.startsWith('html:')) {
+			return 'html';
+		}
+		var text = response.text;
+		// format guessed: "< .... >"
+		if (/^[<][\s\S]+/.test(text) && /[\s\S]+[>]$/.test(text)) {
+			return 'html';
+		}
+		return 'text';
 	}
 
 	// convert object to text
@@ -202,7 +266,9 @@ plugin_responses = function plugin_responses() {
 
 	// substitution key format
 	this.var_key = function(name) {
-		return '{' + name + '}';
+		var prefix = self.env('variable_prefix');
+		var suffix = self.env('variable_suffix');
+		return prefix + name + suffix;
 	}
 
 	// substitution template processor
@@ -238,7 +304,12 @@ plugin_responses = function plugin_responses() {
 	// plugin setup
 	this.initialize = function initialize() {
 		self.log('...');
-		rcmail.insert_response = self.insert_response;
+
+		rcmail.insert_response = //
+		self.rcube_webmail_insert_response.bind(rcmail);
+
+		rcmail.editor.replace = //
+		self.rcube_text_editor_replace.bind(rcmail.editor);
 	}
 
 	self.initialize();
