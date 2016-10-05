@@ -15,8 +15,8 @@ Plugin also adds support for html-based response templates.
 
 For example, assuming the following compose message headers:
 ```
-from: "thomas cube" <thomas@roundcube.net>
-to:   "machniak, aleksander" <alec@alec.pl>
+from: "thomas cube" <thomas.cube@mailer.net>
+to:   "machniak, aleksander" <aleks@example.com>
 ```
 
 this sample template with variables:
@@ -38,7 +38,7 @@ will produce the following result after insert:
     Thomas.
     
     --
-    Thomas Cube <thomas@roundcube.net>
+    Thomas Cube <thomas.cube@mailer.net>
 ```
 
 Manual Install
