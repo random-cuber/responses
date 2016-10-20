@@ -85,6 +85,14 @@ Operation
 
 Prepare templates using available plugin variables.
 
+Translation
+-----------
+
+Contribute to [translation via transifex][translation].
+
+
 [roundcube_arch]: https://wiki.archlinux.org/index.php/Roundcube
 [responses_link]: http://plugins.roundcube.net/packages/random-cuber/responses
 [plugin_settings_help]:  https://raw.githubusercontent.com/random-cuber/responses/master/build/plugin_settings_help.png
+
+[translation]: https://www.transifex.com/random-cuber/responses/
