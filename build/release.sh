@@ -1,18 +1,20 @@
 #!/bin/bash
 
-location=$(dirname $0) 
+set -e -u
+
+location=${BASH_SOURCE%/*} 
 
 basedir=$(cd "$location/.." && pwd)
 
 composer="$basedir/composer.json"
 
 version_get() {
-    cat "$composer" | grep '"version":' | sed -r -e 's/^.*([0-9]+[.][0-9]+[.][0-9]+).*$/\1/'
+    cat "$composer" | grep '"version"' | sed -r -e 's/^.*([0-9]+[.][0-9]+[.][0-9]+).*$/\1/'
 }
 
 version_put() {
     local version="$1"
-    sed -i -r -e 's/(^.*"version":.*)([0-9]+[.][0-9]+[.][0-9]+)(.*$)/\1'${version}'\3/' "$composer"
+    sed -i -r -e 's/(^.*"version".*)([0-9]+[.][0-9]+[.][0-9]+)(.*$)/\1'${version}'\3/' "$composer"
 }
 
 version_split() {
