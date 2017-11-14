@@ -33,11 +33,14 @@ $config['plugin.responses.memento_reset'] = false;
 $config['plugin.responses.variable_prefix'] = '{';
 $config['plugin.responses.variable_suffix'] = '}';
 
-// regex for template format detection: i.e. name looks like: "some name : html"
+// regex for 'html' template format detection: i.e. name looks like: "some name : html"
 $config['plugin.responses.format_regex_name'] = '^html[\s:#@]+.+|.+[\s:#@]+html$';
 
-// regex for template format detection: i.e. text looks like: "<div> ... </div>"
+// regex for 'html' template format detection: i.e. body looks like: "<div> ... </div>"
 $config['plugin.responses.format_regex_text'] = '^[<][\s\S]+[>]$';
+
+// regex for directive extracton from the template; note: keep key=value format
+$config['plugin.responses.directive_pattern'] = '^\s*###directive###\s*([^=\s]+)\s*=\s*(.+)\s*$';
 
 // XXX: no config override
 // plugin-provided template
@@ -53,10 +56,20 @@ $response_help = <<<EOT
     'full' - full name guessed form address [ example: "First Last" ]
     'head' - first name guessed form address [ example: "First" ]
     'tail' - last name guessed form address [ example: "Last" ]
-    'mail' - mail-only extracted form address [ example: "user@host" ] 
+    'mail' - mail-only extracted form address [ example: "user@host" ]
+    'subj' - original response subject 
+    #
+    Directive format: [maker] key=value
+    Directive values also can use variable substituion.
+    Directives are processing instructions which are applied and removed from the tempalte.
+    Available directives:
+    'subject_replace' - substitute response subect: 
+    ###directive### subject_replace = [this subject comes from directive] {subj}/{to_mail}
     #
     Template variable substitution result (view in the mail compose window):
     #
+    # message 'subject'
+        subj : {subj} 
     # mail 'from' - solo item
         from_text : {from_text}
         from_name : {from_name}
@@ -85,6 +98,7 @@ EOT;
 // XXX: no config override
 // plugin-provided template
 $response_text_thank_you = <<<EOT
+###directive### subject_replace = [YES] {subj} 
     {to_head}, hello.
     
     Thank you,
@@ -98,6 +112,7 @@ EOT;
 // plugin-provided template
 $response_html_thank_you = <<<EOT
 <div style="margin-left:2em;">
+###directive### subject_replace = [YES] {subj} 
     <b>{to_head}</b>, hello.
     <br/>
     <br/>

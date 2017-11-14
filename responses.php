@@ -20,16 +20,20 @@ class responses extends rcube_plugin {
         'format_regex_name',
         'format_regex_text',
         'editor_warned',
+        'directive_pattern',
     );
     
-    private $rc; // controller singleton
+    // controller singleton
+    private $rc; 
 
-	public $task = 'mail|settings'; // supported tasks regex filter
+    // supported tasks regex filter
+	public $task = 'mail|settings'; 
 	
 	function init() {
         $this->rc = rcmail::get_instance();
         $task = $this->rc->task; $action = $this->rc->action;
 
+        // activate plugin for mail/compose
         if ($task == 'mail' && $this->is_root_request()) {
             if($action == 'compose' && $this->is_html_request()) {
                 $this->init_config();
@@ -40,6 +44,7 @@ class responses extends rcube_plugin {
             return;
         }
 
+        // activate plugin for settings
         if ($task == 'settings') {
             $this->init_config();
             $this->template_reset();
