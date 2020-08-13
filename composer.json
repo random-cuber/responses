@@ -11,7 +11,7 @@
 	"homepage" : "https://github.com/random-cuber/responses",
 	"license" : "Apache",
 	"type" : "roundcube-plugin",
-	"version" : "1.3.12",
+	"version" : "1.3.13",
 	"authors" : [{
 			"name" : "Andrei Pozolotin",
 			"email" : "andrei.pozolotin@gmail.com",
